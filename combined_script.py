@@ -12,13 +12,12 @@ import copy
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-from label_flipping_attack import poison_data
-import utils
 from model import LeNet
 from train_loop import trainFL
 
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
+
 args = load_arguments()
 device = torch.device("cuda" if torch.cuda.is_available() and args.device == "gpu" else "cpu")  
 global_network = LeNet(1).to(device)
