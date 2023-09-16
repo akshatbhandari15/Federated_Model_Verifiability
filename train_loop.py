@@ -59,6 +59,34 @@ class trainFL:
         random.seed(seed)
 
     def train(self):
+        if (self.args.phase == 3):
+            client_list = random.sample(range(self.num_devices), self.num_devices)
+            #print("Client List: ", client_list)
+            set_malicious_devices = set(self.malicious_devices)
+            trusted_clients =  [client for client in client_list if client not in set_malicious_devices]
+            #print("Trusted_devices:", trusted_clients)
+
+            all_labels = get_client_data_stat(self.train_dataset)
+            client_idx_dynamic_dataset = []
+            dynamic_datasets = []
+            client_labels = {}
+            for i in trusted_clients:
+                device_sample_labels = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[i])
+                labels = get_client_data_stat(device_sample_labels)
+                print("Client Labels: ", labels)
+                if (len(client_labels.keys() ^ labels.keys()) > 0):
+                    client_idx_dynamic_dataset.append(i)
+                    dynamic_datasets.append(device_sample_labels)
+                    client_labels.update(labels)
+                if (len(client_labels.items()) == len(all_labels.items())):
+                    break
+            
+
+            print("Client Labels: ", client_labels.keys())
+            print("Client Indexes to use: ", client_idx_dynamic_dataset)
+            print("All Labels: ", all_labels.keys())
+
+        cosine_similarity_all_crounds = []
         for CR in range(self.c_rounds):
             print('****************** CR ******************:',CR)
             
@@ -131,62 +159,14 @@ class trainFL:
                 to_df.append(phases.phase2(self.global_network, local_weights, dataset_to_train_global_model, self.args, self.device))
             
             elif(self.args.phase == 3):
-                client_list = random.sample(range(self.num_devices), self.num_devices)
-                #print("Client List: ", client_list)
-                set_malicious_devices = set(self.malicious_devices)
-                trusted_clients =  [client for client in client_list if client not in set_malicious_devices]
-                #print("Trusted_devices:", trusted_clients)
-
-                all_labels = get_client_data_stat(self.train_dataset)
-                client_idx_dynamic_dataset = []
-                dynamic_datasets = []
-                client_labels = {}
-                for i in trusted_clients:
-                    device_sample_labels = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[i])
-                    labels = get_client_data_stat(device_sample_labels)
-                    print("Client Labels: ", labels)
-                    if (len(client_labels.keys() ^ labels.keys()) > 0):
-                        client_idx_dynamic_dataset.append(i)
-                        dynamic_datasets.append(device_sample_labels)
-                        client_labels.update(labels)
-                    if (len(client_labels.items()) == len(all_labels.items())):
-                        break
-
-
-                print("Client Labels: ", client_labels.keys())
-                print("Client Indexes to use: ", client_idx_dynamic_dataset)
-                print("All Labels: ", all_labels.keys())
-
-                to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
+                to_df.append(np.squeeze(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device)))
             
+
             
-            filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
             #print(np.array(to_df.cpu()).shape)
             to_df = np.array(to_df)
-            #print(to_df.shape)
-            writer = pd.ExcelWriter(f'Results/{filname}.xlsx', engine='xlsxwriter')
-
-
-
-            for i in range(0, to_df.shape[1]):
-                #print(pd.DataFrame(to_df[:,:,i]))
-                df = pd.DataFrame(to_df[:,i,:])
-                df.to_excel(writer, sheet_name='Dataset%d' % i)
-                
-                plt.clf()
-                #ss = stats[[f'{i}_{j}_cosine' for j in range(model.num_devices)]].astype(float).to_numpy()
-                ax = sns.heatmap(df)
-                ax.figure.savefig(f'Results/{filname}_{i}_heatmap.png')
-            writer.close()           
-            #df.to_excel(f'{self.args.filename}.xlsx')
-
-
-
-
-
-
-
-
+            cosine_similarity_all_crounds.append(to_df)
+            #print(to_df.shap
             print()
         #     local_weights = [local_weights[i] for i in range(len(local_weights)) if i not in malicious_devices]
             global_weights = utils.model_average(local_weights)
@@ -201,3 +181,22 @@ class trainFL:
             dev_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample, batch_size = self.batch_size),network, self.device)
             
             self.device_acc.append(dev_test_acc)
+    
+        filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
+
+        writer = pd.ExcelWriter(f'Results/{filname}.xlsx', engine='xlsxwriter')
+
+
+        to_df = np.array(cosine_similarity_all_crounds)
+
+        print(to_df.shape)
+        for i in range(0, to_df.shape[1]):
+                #print(pd.DataFrame(to_df[:,:,i]))
+                df = pd.DataFrame(to_df[:, i, :])
+                df.to_excel(writer, sheet_name='Dataset%d' % i)
+                plt.clf()
+                #ss = stats[[f'{i}_{j}_cosine' for j in range(model.num_devices)]].astype(float).to_numpy()
+                ax = sns.heatmap(df)
+                ax.figure.savefig(f'Results/{filname}_{i}_heatmap.png')
+        writer.close()           
+            #df.to_excel(f'{self.args.filename}.xlsx')
