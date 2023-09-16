@@ -4,7 +4,6 @@ import random
 import os
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-import json
 
 def data_distribution(niid, trainset, no_of_clients):
     labels = []
@@ -113,16 +112,3 @@ transform = transforms.Compose([transforms.ToTensor(),
 train_dataset = datasets.MNIST(root="./dataset", train=True, transform=transform, download=True)
 test_dataset = datasets.MNIST(root="./dataset", train=False, transform=transform, download=True)
 
-"""
-#data_distribution(1, train_dataset)
-
-with open('data_dist/other_data_niid_0.txt') as f:
-        train_dataset_idxs = json.loads(f.read())
-    
-#print(np.ndim(train_dataset_idxs))
-
-pt_file = torch.load("Distribution/mnist/data_split_niid_1.pt")
-train_dataset_idxs = pt_file['datapoints']
-#print(np.ndim(pt_file['datapoints']))
-
-"""

@@ -4,7 +4,6 @@
 import argparse
 import os
 from os import path
-import logging
 import yaml
 
 
@@ -85,15 +84,11 @@ class Arguments:
 
 def load_arguments(training_type=None, comm_backend=None):
     cmd_args = add_args()
-    # Load all arguments from YAML config file
     args = Arguments(cmd_args, training_type, comm_backend)
 
     if not hasattr(args, "worker_num") and hasattr(args, "client_num_per_round"):
         args.worker_num = args.client_num_per_round
-        
-    # os.path.expanduser() method in Python is used
-    # to expand an initial path component ~( tilde symbol)
-    # or ~user in the given path to user’s home directory.
+    
     if hasattr(args, "data_cache_dir"):
         args.data_cache_dir = os.path.expanduser(args.data_cache_dir)
     if hasattr(args, "data_file_path"):
@@ -103,7 +98,5 @@ def load_arguments(training_type=None, comm_backend=None):
     if hasattr(args, "part_file"):
         args.part_file = os.path.expanduser(args.part_file)
 
-    #args.rank = int(args.rank)
     return args
 
-#print(vars(load_arguments()))

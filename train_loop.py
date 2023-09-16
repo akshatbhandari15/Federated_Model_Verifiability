@@ -11,6 +11,8 @@ import phases
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from model import LeNet
+from arguments import load_arguments
 
 class trainFL:
     def __init__(self, args, global_network):
@@ -22,7 +24,6 @@ class trainFL:
         self.lr = args.learning_rate
         self.niid = args.niid
         self.num_devices = args.client_num_in_total
-        
         self.epochs = args.epochs
         self.c_rounds = args.comm_round
         self.num_malicious_devices = int(args.num_malicious_devices * args.client_num_in_total)
@@ -30,9 +31,6 @@ class trainFL:
         self.malicious_devices = random.sample(range(self.num_devices), self.num_malicious_devices)
         self.trusted_client = random.sample(range(self.num_devices), 1)
         
-
-
-
         if (args.blur):
             self.train_dataset, self.test_dataset, self.train_dataset_with_blur = utils.data_loader(args)
         else:
@@ -41,14 +39,12 @@ class trainFL:
 
         data_distribution(self.niid, self.train_dataset, self.num_devices)
         file_name = 'Distribution/mnist/data_split_niid_'+ str(self.niid)+ "_no_of_clients_" + str(self.num_devices)+'.pt'
-        pt_file = torch.load(file_name)
-        
+        pt_file = torch.load(file_name)    
         seed = 123
         self.train_dataset_idxs = pt_file['datapoints']
         print("Malicious Devices: ", self.malicious_devices)
         self.g = torch.Generator()
-        self.g.manual_seed(seed)
-        
+        self.g.manual_seed(seed)    
         torch.manual_seed(seed)
         random.seed(seed)
         np.random.seed(seed)
@@ -85,22 +81,22 @@ class trainFL:
             print("Client Labels: ", client_labels.keys())
             print("Client Indexes to use: ", client_idx_dynamic_dataset)
             print("All Labels: ", all_labels.keys())
+        elif (self.args.phase == 2):
+            trusted_client = random.sample(range(self.num_devices), 1)
+            while (trusted_client in self.malicious_devices):
+                trusted_client = random.sample(range(self.num_devices), 1)
+            print("Trusted Client:", trusted_client)
+            dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
 
         cosine_similarity_all_crounds = []
         for CR in range(self.c_rounds):
             print('****************** CR ******************:',CR)
-            
             local_weights = []
             cosine_similarity = []
-
-
             for d in range(self.num_devices):
                 print('Device ID:',d)
                 network = copy.deepcopy(self.global_network).to(self.device)
                 optimizer = torch.optim.Adam(network.parameters(), lr=self.lr)
-                #print(device_sample[0])
-                #print(device_sample[0][0].shape)
-                #train_dataset = datasets.MNIST(root="./dataset", train=True, transform=transform, download=True)
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
                 original_dev_sample = copy.deepcopy(device_sample)            
                             
@@ -113,7 +109,6 @@ class trainFL:
                         optimizer = torch.optim.Adam(network.parameters(), lr=self.args.learning_rate_poison)
 
 
-                    #print(device_sample[0][0].shape, device_sample[0][1].shape)
                 
                 train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
 
@@ -144,31 +139,19 @@ class trainFL:
                     print()
                 
                 local_weights.append(network.state_dict())
-
-
             to_df = []
             if (self.args.phase == 1):
-
                 to_df.append(phases.phase1(self.global_network, local_weights, self.device))
             elif (self.args.phase == 2):
-                trusted_client = random.sample(range(self.num_devices), 1)
-                while (trusted_client in self.malicious_devices):
-                    trusted_client = random.sample(range(self.num_devices), 1)
-                print("Trusted Client:", trusted_client)
-                dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
                 to_df.append(phases.phase2(self.global_network, local_weights, dataset_to_train_global_model, self.args, self.device))
             
             elif(self.args.phase == 3):
-                to_df.append(np.squeeze(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device)))
+                to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
             
 
             
-            #print(np.array(to_df.cpu()).shape)
-            to_df = np.array(to_df)
-            cosine_similarity_all_crounds = to_df
-            #print(to_df.shap
+            cosine_similarity_all_crounds = np.array(to_df)
             print()
-        #     local_weights = [local_weights[i] for i in range(len(local_weights)) if i not in malicious_devices]
             global_weights = utils.model_average(local_weights)
             self.global_network.load_state_dict(global_weights)
             global_test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset, batch_size = self.batch_size), self.global_network,self.device)
@@ -191,12 +174,16 @@ class trainFL:
 
         print(to_df.shape)
         for i in range(0, to_df.shape[1]):
-                #print(pd.DataFrame(to_df[:,:,i]))
                 df = pd.DataFrame(to_df[:, i, :])
                 df.to_excel(writer, sheet_name='Dataset%d' % i)
                 plt.clf()
-                #ss = stats[[f'{i}_{j}_cosine' for j in range(model.num_devices)]].astype(float).to_numpy()
                 ax = sns.heatmap(df)
                 ax.figure.savefig(f'Results/{filname}_{i}_heatmap.png')
         writer.close()           
-            #df.to_excel(f'{self.args.filename}.xlsx')
+
+if __name__ == "__main__":
+    args = load_arguments()
+    device = torch.device("cuda" if torch.cuda.is_available() and args.device == "gpu" else "cpu")  
+    global_network = LeNet(1).to(device)
+    train_object = trainFL(args=args, global_network=global_network)
+    train_object.train()

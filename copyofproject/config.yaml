@@ -1,0 +1,37 @@
+data_args:
+  dataset: "mnist"
+  niid: 2
+  filename: "lenet_mnist_100clients_0.1malclients_niid2_phase3"
+
+data_poison_attacks:
+  blur: True
+  label_flipping: False
+
+model_poison_attacks:
+  learning_rate_poison: 1
+
+blur_parameters:
+  kernal_size: 5
+  sigma: 0.6
+
+label_flipping_parameters:
+  no_of_labels_to_flip: 3
+
+model_args:
+  model: "lenet"
+  epochs: 1
+  batch_size: 64
+  learning_rate: 0.001
+  device: 'gpu'  
+
+train_args:
+  federated_algorithm: "FedAvg"
+  num_malicious_devices: 0.1
+  client_num_in_total: 10
+  comm_round: 1
+  device: 'gpu'  
+
+
+
+phase:
+  phase: 3

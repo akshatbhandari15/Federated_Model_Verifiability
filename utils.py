@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-from torch.utils.data import Dataset
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import copy
@@ -111,6 +110,4 @@ def global_train_loop(network, dataset, args, device):
         self_test_acc = check_accuracy(DataLoader(dataset=dataset,batch_size = args.batch_size),network,device)
         print(f'Self Test Acc {round(self_test_acc,2)*100} %')
         
-        #test_acc = check_accuracy(DataLoader(dataset=args.test_dataset,batch_size = args.batch_size),network,device)
-        #print(f'Test Acc {round(test_acc,2)*100} %')
         print()

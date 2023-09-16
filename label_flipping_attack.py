@@ -1,16 +1,6 @@
-import logging
-import math
 import random
 import torch
-from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
-import numpy as np
-
-
-
-from abc import ABC
-from collections import OrderedDict
-from typing import List, Tuple, Dict, Any
 
 def replace_original_class_with_target_class(
         data_labels, no_of_labels_to_flip
@@ -20,7 +10,12 @@ def replace_original_class_with_target_class(
     :type targets: list
     :return: new class IDs
     """
+
+
     data_labels_set = set(data_labels)
+    
+    if( no_of_labels_to_flip > len(data_labels_set)):
+        no_of_labels_to_flip = len(data_labels_set)
     original_class_list = random.choice(data_labels_set, no_of_labels_to_flip, replace = False)
     target_class_list = random.choice(data_labels_set, no_of_labels_to_flip, replace = False)
     
@@ -55,49 +50,23 @@ def get_client_data_stat(local_dataset):
     #print("-==========================")
     targets_set = {}
     for batch_idx, (data, targets) in enumerate(local_dataset):
-        #print("Targets: " , targets)
         for t in [targets]:
             if t in targets_set.keys():
                 targets_set[t] += 1
             else:
                 targets_set[t] = 1
-            # if t not in targets_set.keys():
-            #     targets_set[t] = 1
-            # else:
-            #     targets_set[t] += 1
-    total_counter = 0
-    # for item in targets_set.items():
-    #     print("------target:{} num:{}".format(item[0], item[1]))
-    #     total_counter += item[1]
-    # print(f"total counter = {total_counter}")
-    #
-    # targets_set = {}
-    # for batch_idx, (data, targets) in enumerate(local_dataset):
-    #     for t in targets.tolist():
-    #         if t in targets_set.keys():
-    #             targets_set[t] += 1
-    #         else:
-    #             targets_set[t] = 1
-    #         # if t not in targets_set.keys():
-    #         #     targets_set[t] = 1
-    #         # else:
-    #         #     targets_set[t] += 1
-    # total_counter = 0
-    for item in targets_set.items():
-        #print("------target:{} num:{}".format(item[0], item[1]))
-        total_counter += item[1]
-    #print(f"total counter = {total_counter}")
 
+    total_counter = 0
+
+    for item in targets_set.items():
+        total_counter += item[1]
     return targets_set
 
 
 
 def poison_data(local_dataset, no_of_labels_to_flip):
     get_client_data_stat(local_dataset)
-    # print("=======================1 end ")
-    # self.print_dataset(local_dataset)
-    # get_client_data_stat(local_dataset)
-    # print("======================= 2 end")
+
     tmp_local_dataset_x = torch.Tensor([])
     tmp_local_dataset_y = torch.Tensor([])
     targets_set = {}
@@ -113,12 +82,7 @@ def poison_data(local_dataset, no_of_labels_to_flip):
                 targets_set[t] = 1
     total_counter = 0
     for item in targets_set.items():
-        # print("------target:{} num:{}".format(item[0], item[1]))
         total_counter += item[1]
-    # print(f"total counter = {total_counter}")
-
-    ####################### below are correct ###############################3
-
     
 
     tmp_y = replace_original_class_with_target_class(
