@@ -165,7 +165,7 @@ class trainFL:
             
             #print(np.array(to_df.cpu()).shape)
             to_df = np.array(to_df)
-            cosine_similarity_all_crounds.append(to_df)
+            cosine_similarity_all_crounds = to_df
             #print(to_df.shap
             print()
         #     local_weights = [local_weights[i] for i in range(len(local_weights)) if i not in malicious_devices]
