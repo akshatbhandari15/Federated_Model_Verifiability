@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from model import LeNet
 from arguments import load_arguments
 from pathlib import Path
+from tqdm import tqdm
 
 class trainFL:
     def __init__(self, args, global_network):
@@ -90,12 +91,11 @@ class trainFL:
             dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
         to_df = []
         cosine_similarity_all_crounds = []
-        for CR in range(self.c_rounds):
-            print('****************** CR ******************:',CR)
+        for CR in tqdm(range(self.c_rounds), "CR: "):
+            #print('****************** CR ******************:',CR)
             local_weights = []
             cosine_similarity = []
-            for d in range(self.num_devices):
-                print('Device ID:',d)
+            for d in tqdm(range(self.num_devices), "Current CR: "):
                 network = copy.deepcopy(self.global_network).to(self.device)
                 optimizer = torch.optim.Adam(network.parameters(), lr=self.lr)
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
@@ -106,12 +106,12 @@ class trainFL:
                         device_sample = torch.utils.data.Subset(self.train_dataset_with_blur, self.train_dataset_idxs[d])
                     if (self.args.label_flipping):
                         device_sample = poison_data(device_sample, self.args.no_of_labels_to_flip)
-                    if (self.args.learning_rate):
+                    if (self.args.learning_rate_attack):
                         optimizer = torch.optim.Adam(network.parameters(), lr=self.args.learning_rate_poison_value)
                 train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
 
 
-                for epoch in range(self.epochs):
+                for epoch in tqdm(range(self.epochs), desc="Device ID: " + str(d) ):
                     total_loss = 0
 
                     for _, (data, targets) in enumerate(train_loader):
@@ -128,13 +128,13 @@ class trainFL:
                         loss.backward()
                         optimizer.step()
 
-                    print(f'Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
+                    tqdm.write(f'Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
                     self_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample,batch_size = self.batch_size),network,self.device)
-                    print(f'Self Test Acc {round(self_test_acc,2)*100} %')
+                    tqdm.write(f'Self Test Acc {round(self_test_acc,2)*100} %')
                     
                     test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
-                    print(f'Test Acc {round(test_acc,2)*100} %')
-                    print()
+                    tqdm.write(f'Test Acc {round(test_acc,2)*100} %')
+      
                 
                 local_weights.append(network.state_dict())
             if (self.args.phase == 1):
