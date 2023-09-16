@@ -87,7 +87,7 @@ class trainFL:
                 trusted_client = random.sample(range(self.num_devices), 1)
             print("Trusted Client:", trusted_client)
             dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
-
+        to_df = []
         cosine_similarity_all_crounds = []
         for CR in range(self.c_rounds):
             print('****************** CR ******************:',CR)
@@ -107,9 +107,6 @@ class trainFL:
                         device_sample = poison_data(device_sample, self.args.no_of_labels_to_flip)
                     if (self.args.learning_rate is not None):
                         optimizer = torch.optim.Adam(network.parameters(), lr=self.args.learning_rate_poison)
-
-
-                
                 train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
 
 
@@ -139,7 +136,6 @@ class trainFL:
                     print()
                 
                 local_weights.append(network.state_dict())
-            to_df = []
             if (self.args.phase == 1):
                 to_df.append(phases.phase1(self.global_network, local_weights, self.device))
             elif (self.args.phase == 2):
