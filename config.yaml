@@ -8,7 +8,10 @@ data_poison_attacks:
   label_flipping: False
 
 model_poison_attacks:
-  learning_rate_poison: 1
+  learning_rate_attack: False
+
+learning_rate_attack:
+  learning_rate_poison_value: 1
 
 blur_parameters:
   kernal_size: 5

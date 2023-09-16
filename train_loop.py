@@ -13,6 +13,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from model import LeNet
 from arguments import load_arguments
+from pathlib import Path
 
 class trainFL:
     def __init__(self, args, global_network):
@@ -105,8 +106,8 @@ class trainFL:
                         device_sample = torch.utils.data.Subset(self.train_dataset_with_blur, self.train_dataset_idxs[d])
                     if (self.args.label_flipping):
                         device_sample = poison_data(device_sample, self.args.no_of_labels_to_flip)
-                    if (self.args.learning_rate is not None):
-                        optimizer = torch.optim.Adam(network.parameters(), lr=self.args.learning_rate_poison)
+                    if (self.args.learning_rate):
+                        optimizer = torch.optim.Adam(network.parameters(), lr=self.args.learning_rate_poison_value)
                 train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
 
 
@@ -163,7 +164,9 @@ class trainFL:
     
         filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
 
-        writer = pd.ExcelWriter(f'Results/{filname}.xlsx', engine='xlsxwriter')
+        Path(f"Results/{filname}").mkdir(parents=True, exist_ok=True)
+
+        writer = pd.ExcelWriter(f'Results/{filname}/{filname}.xlsx', engine='xlsxwriter')
 
 
         to_df = np.array(cosine_similarity_all_crounds)
@@ -174,7 +177,7 @@ class trainFL:
                 df.to_excel(writer, sheet_name='Dataset%d' % i)
                 plt.clf()
                 ax = sns.heatmap(df)
-                ax.figure.savefig(f'Results/{filname}_{i}_heatmap.png')
+                ax.figure.savefig(f'Results/{filname}/{filname}_{i}_heatmap.png')
         writer.close()           
 
 if __name__ == "__main__":
