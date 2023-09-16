@@ -57,6 +57,9 @@ class trainFL:
         random.seed(seed)
 
     def train(self):
+        train_loss_log = tqdm(total=0, position=3, bar_format='{desc}')
+        self_test_acc_log = tqdm(total=0, position=4, bar_format='{desc}')
+        test_acc_log = tqdm(total=0, position=5, bar_format='{desc}')
         if (self.args.phase == 3):
             client_list = random.sample(range(self.num_devices), self.num_devices)
             #print("Client List: ", client_list)
@@ -91,11 +94,11 @@ class trainFL:
             dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
         to_df = []
         cosine_similarity_all_crounds = []
-        for CR in tqdm(range(self.c_rounds), "CR: "):
+        for CR in tqdm(range(self.c_rounds),position=1,desc= "CR: "):
             #print('****************** CR ******************:',CR)
             local_weights = []
             cosine_similarity = []
-            for d in tqdm(range(self.num_devices), "Current CR: "):
+            for d in range(self.num_devices):
                 network = copy.deepcopy(self.global_network).to(self.device)
                 optimizer = torch.optim.Adam(network.parameters(), lr=self.lr)
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
@@ -111,7 +114,7 @@ class trainFL:
                 train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
 
 
-                for epoch in tqdm(range(self.epochs), desc="Device ID: " + str(d) ):
+                for epoch in tqdm(range(self.epochs), position=2, desc="Device ID: " + str(d) ):
                     total_loss = 0
 
                     for _, (data, targets) in enumerate(train_loader):
@@ -128,12 +131,11 @@ class trainFL:
                         loss.backward()
                         optimizer.step()
 
-                    tqdm.write(f'Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
+                    train_loss_log.set_description_str(f'Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
                     self_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample,batch_size = self.batch_size),network,self.device)
-                    tqdm.write(f'Self Test Acc {round(self_test_acc,2)*100} %')
-                    
+                    self_test_acc_log.set_description_str(f'Self Test Acc {round(self_test_acc,2)*100} %')
                     test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
-                    tqdm.write(f'Test Acc {round(test_acc,2)*100} %')
+                    test_acc_log.set_description_str(f'Test Acc {round(test_acc,2)*100} %')
       
                 
                 local_weights.append(network.state_dict())
