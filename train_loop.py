@@ -30,7 +30,7 @@ class trainFL:
         self.epochs = args.epochs
         self.c_rounds = args.comm_round
         self.num_malicious_devices = int(args.num_malicious_devices * args.client_num_in_total)
-        self.device = torch.device("cuda" if torch.cuda.is_available() and args.device == "gpu" else "cpu")
+        self.device = torch.device(f"cuda:{args.gpu_id}" if torch.cuda.is_available() and args.device == "gpu" else "cpu")
         self.malicious_devices = random.sample(range(self.num_devices), self.num_malicious_devices)
         wandb.init(
             # set the wandb project where this run will be logged
@@ -165,7 +165,7 @@ class trainFL:
 
             self.CR_acc.append(global_test_acc)
             
-            global_train_acc = utils.check_accuracy(DataLoader(dataset=train_dataset, batch_size = self.batch_size), self.global_network, self.device)
+            global_train_acc = utils.check_accuracy(DataLoader(dataset=self.train_dataset, batch_size = self.batch_size), self.global_network, self.device)
             wandb.log({"test_acc": global_test_acc, "train_acc": global_train_acc})
     
         filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
@@ -193,7 +193,7 @@ class trainFL:
 
 if __name__ == "__main__":
     args = load_arguments()
-    device = torch.device("cuda" if torch.cuda.is_available() and args.device == "gpu" else "cpu")  
+    device = torch.device(f"cuda:{args.gpu_id}" if torch.cuda.is_available() and args.device == "gpu" else "cpu")  
     global_network = LeNet(1).to(device)
     train_object = trainFL(args=args, global_network=global_network)
     train_object.train()

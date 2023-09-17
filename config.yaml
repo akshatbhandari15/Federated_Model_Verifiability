@@ -33,7 +33,8 @@ train_args:
   num_malicious_devices: 0.1
   client_num_in_total: 10
   comm_round: 5
-  device: 'gpu'  
+  device: 'gpu'
+  gpu_id: 1
 
 
 
