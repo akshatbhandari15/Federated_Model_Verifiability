@@ -15,6 +15,7 @@ from model import LeNet
 from arguments import load_arguments
 from pathlib import Path
 from tqdm import tqdm
+import wandb
 
 class trainFL:
     def __init__(self, args, global_network):
@@ -31,8 +32,14 @@ class trainFL:
         self.num_malicious_devices = int(args.num_malicious_devices * args.client_num_in_total)
         self.device = torch.device("cuda" if torch.cuda.is_available() and args.device == "gpu" else "cpu")
         self.malicious_devices = random.sample(range(self.num_devices), self.num_malicious_devices)
-        self.trusted_client = random.sample(range(self.num_devices), 1)
-        
+        wandb.init(
+            # set the wandb project where this run will be logged
+            project="flproject",
+            
+            # track hyperparameters and run metadata
+            config=vars(args)
+        )        
+
         if (args.blur):
             self.train_dataset, self.test_dataset, self.train_dataset_with_blur = utils.data_loader(args)
         else:
@@ -57,15 +64,21 @@ class trainFL:
         random.seed(seed)
 
     def train(self):
-        train_loss_log = tqdm(total=0, position=3, bar_format='{desc}')
-        self_test_acc_log = tqdm(total=0, position=4, bar_format='{desc}')
-        test_acc_log = tqdm(total=0, position=5, bar_format='{desc}')
+        train_loss_log = tqdm(total=0, bar_format='{desc}', position=2)
+        self_test_acc_log = tqdm(total=0, bar_format='{desc}', position=3)
+        test_acc_log = tqdm(total=0, bar_format='{desc}', position = 4)
+
+        if (self.args.phase == 2):
+            trusted_client = random.sample(range(self.num_devices), 1)
+            while (trusted_client in self.malicious_devices):
+                trusted_client = random.sample(range(self.num_devices), 1)
+            print("Trusted Client:", trusted_client)
+            dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
+        
         if (self.args.phase == 3):
             client_list = random.sample(range(self.num_devices), self.num_devices)
-            #print("Client List: ", client_list)
             set_malicious_devices = set(self.malicious_devices)
             trusted_clients =  [client for client in client_list if client not in set_malicious_devices]
-            #print("Trusted_devices:", trusted_clients)
 
             all_labels = get_client_data_stat(self.train_dataset)
             client_idx_dynamic_dataset = []
@@ -74,7 +87,6 @@ class trainFL:
             for i in trusted_clients:
                 device_sample_labels = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[i])
                 labels = get_client_data_stat(device_sample_labels)
-                print("Client Labels: ", labels)
                 if (len(client_labels.keys() ^ labels.keys()) > 0):
                     client_idx_dynamic_dataset.append(i)
                     dynamic_datasets.append(device_sample_labels)
@@ -86,23 +98,20 @@ class trainFL:
             print("Client Labels: ", client_labels.keys())
             print("Client Indexes to use: ", client_idx_dynamic_dataset)
             print("All Labels: ", all_labels.keys())
-        elif (self.args.phase == 2):
-            trusted_client = random.sample(range(self.num_devices), 1)
-            while (trusted_client in self.malicious_devices):
-                trusted_client = random.sample(range(self.num_devices), 1)
-            print("Trusted Client:", trusted_client)
-            dataset_to_train_global_model = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[trusted_client[0]])
+
+
         to_df = []
         cosine_similarity_all_crounds = []
-        for CR in tqdm(range(self.c_rounds),position=1,desc= "CR: "):
+        for CR in tqdm(range(self.c_rounds), position=0, desc= "CR: "):
             #print('****************** CR ******************:',CR)
             local_weights = []
-            cosine_similarity = []
-            for d in range(self.num_devices):
+            for d in tqdm(range(self.num_devices), position=1):
                 network = copy.deepcopy(self.global_network).to(self.device)
                 optimizer = torch.optim.Adam(network.parameters(), lr=self.lr)
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
-                original_dev_sample = copy.deepcopy(device_sample)            
+                original_dev_sample = copy.deepcopy(device_sample)  
+                if (self.args.loss_function == "cross_entropy"):
+                    criterion = F.cross_entropy           
                             
                 if d in self.malicious_devices:
                     if (self.args.blur):
@@ -114,7 +123,7 @@ class trainFL:
                 train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
 
 
-                for epoch in tqdm(range(self.epochs), position=2, desc="Device ID: " + str(d) ):
+                for epoch in range(self.epochs):
                     total_loss = 0
 
                     for _, (data, targets) in enumerate(train_loader):
@@ -124,20 +133,18 @@ class trainFL:
                         targets = targets.long()
                         network.train()
                         output = network(data) 
-                        loss = F.cross_entropy(output, targets)
+                        loss = criterion(output, targets)
                         total_loss += loss.item()
 
                         optimizer.zero_grad()
                         loss.backward()
                         optimizer.step()
 
-                    train_loss_log.set_description_str(f'Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
                     self_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample,batch_size = self.batch_size),network,self.device)
-                    self_test_acc_log.set_description_str(f'Self Test Acc {round(self_test_acc,2)*100} %')
                     test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
                     test_acc_log.set_description_str(f'Test Acc {round(test_acc,2)*100} %')
-      
-                
+                    train_loss_log.set_description_str(f'Device: {d} Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
+                    self_test_acc_log.set_description_str(f'Self Test Acc {round(self_test_acc,2)*100} %')          
                 local_weights.append(network.state_dict())
             if (self.args.phase == 1):
                 to_df.append(phases.phase1(self.global_network, local_weights, self.device))
@@ -146,8 +153,6 @@ class trainFL:
             
             elif(self.args.phase == 3):
                 to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
-            
-
             
             cosine_similarity_all_crounds = np.array(to_df)
             print()
@@ -160,9 +165,8 @@ class trainFL:
 
             self.CR_acc.append(global_test_acc)
             
-            dev_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample, batch_size = self.batch_size),network, self.device)
-            
-            self.device_acc.append(dev_test_acc)
+            global_train_acc = utils.check_accuracy(DataLoader(dataset=train_dataset, batch_size = self.batch_size), self.global_network, self.device)
+            wandb.log({"test_acc": global_test_acc, "train_acc": global_train_acc})
     
         filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
 
@@ -181,6 +185,11 @@ class trainFL:
                 ax = sns.heatmap(df)
                 ax.figure.savefig(f'Results/{filname}/{filname}_{i}_heatmap.png')
         writer.close()           
+
+        plt.clf()  
+        ax = sns.lineplot(y=global_test_acc, x = range(len(global_test_acc)))
+        ax.figure.savefig(f'Results/{filname}/{filname}_test_accuracy_plot.png')
+
 
 if __name__ == "__main__":
     args = load_arguments()

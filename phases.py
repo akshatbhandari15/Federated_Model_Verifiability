@@ -6,7 +6,6 @@ import copy
 def phase1(global_network, local_weights, device):
     
     cosine_similarity = []
-    cosine_similarity_utils = []
     flattened_weight_global = torch.Tensor([]).to(device=device)
     for key, value in global_network.state_dict().items():
         flattened_weight_global = torch.cat((flattened_weight_global, torch.flatten(value)))
@@ -17,9 +16,8 @@ def phase1(global_network, local_weights, device):
         for key, value in local_weights[i].items():
             flattened_weight = torch.cat((flattened_weight, torch.flatten(value)))
 
-        cosine_similarity.append(F.cosine_similarity(flattened_weight, flattened_weight_global, dim = 0))
+        cosine_similarity.append(F.cosine_similarity(flattened_weight, flattened_weight_global, dim = 0).tolist())
     print(cosine_similarity)
-    print(cosine_similarity_utils)
     return cosine_similarity
 
 def phase2(global_network, local_weights, dataset_to_train_global_model, args, device):
@@ -53,7 +51,7 @@ def phase2(global_network, local_weights, dataset_to_train_global_model, args, d
     wc = torch.sub(flattened_weight_global_trained, flattened_weight_global)
     
     for i in range(len(gradient_weights)):
-        cosine_similarity.append(F.cosine_similarity(gradient_weights[i], wc, dim = 0))
+        cosine_similarity.append(F.cosine_similarity(gradient_weights[i], wc, dim = 0).tolist())
     return (cosine_similarity)
 
 

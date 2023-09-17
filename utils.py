@@ -6,6 +6,7 @@ import copy
 import random
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
+from tqdm import tqdm
 
 
 def data_loader(args):
@@ -90,7 +91,7 @@ def global_train_loop(network, dataset, args, device):
     print("#########################Global Model Training###############")
     train_loader = DataLoader(dataset=dataset, batch_size=args.batch_size, shuffle=True, worker_init_fn=seed_worker, generator=g)
     optimizer = torch.optim.Adam(network.parameters(), lr=args.learning_rate)
-    for epoch in range(args.epochs):
+    for epoch in tqdm(range(args.epochs)):
         total_loss = 0
 
         for _, (data, targets) in enumerate(train_loader):
