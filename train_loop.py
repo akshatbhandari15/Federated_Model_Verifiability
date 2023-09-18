@@ -109,7 +109,6 @@ class trainFL:
                 network = copy.deepcopy(self.global_network).to(self.device)
                 optimizer = torch.optim.Adam(network.parameters(), lr=self.lr)
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
-                original_dev_sample = copy.deepcopy(device_sample)  
                 if (self.args.loss_function == "cross_entropy"):
                     criterion = F.cross_entropy           
                             
@@ -144,7 +143,7 @@ class trainFL:
                 test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
                 wandb.log({'Test Accuracy':  {f'Client {d}:': round(test_acc,2)*100 }})
                 wandb.log({'Training Loss': {f'Client {d}': total_loss/len(train_loader)}})
-                wandb.long({'Self Test Acc': {f'Client {d}': round(self_test_acc,2)*100}})          
+                wandb.log({'Self Test Acc': {f'Client {d}': round(self_test_acc,2)*100}})          
                 
                 local_weights.append(network.state_dict())
             if (self.args.phase == 1):

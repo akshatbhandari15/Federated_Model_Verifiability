@@ -41,7 +41,7 @@ def phase2(global_network, local_weights, dataset_to_train_global_model, args, d
     
     #train global model    
     global_network_train = copy.deepcopy(global_network).to(device)
-    global_train_loop(global_network_train, dataset_to_train_global_model, args, device=device)
+    global_train_loop(global_network_train, dataset_to_train_global_model, args, device=device, global_network_id=1)
     global_network_train_param = global_network_train.state_dict()
     ##flattening trained model
     flattened_weight_global_trained = torch.Tensor([]).to(device=device)
@@ -76,7 +76,7 @@ def phase3(global_network, local_weights, dynamic_datasets, args, device):
     for i in range(len(dynamic_datasets)):
         global_network_train = copy.deepcopy(global_network).to(device)
         cosine_similarity = []        
-        global_train_loop(global_network_train, dynamic_datasets[i], args, device=device)
+        global_train_loop(global_network_train, dynamic_datasets[i], args, device=device, global_network_id=i)
         global_network_train_param = global_network_train.state_dict()
     ##flattening trained model
         flattened_weight_global_trained = torch.Tensor([]).to(device=device)

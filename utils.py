@@ -7,7 +7,7 @@ import random
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from tqdm import tqdm
-
+import wandb
 
 def data_loader(args):
 
@@ -85,7 +85,7 @@ def seed_worker(worker_id):
     np.random.seed(seed)
     random.seed(seed)
 
-def global_train_loop(network, dataset, args, device):
+def global_train_loop(network, dataset, args, device, global_network_id):
     g = torch.Generator()
     g.manual_seed(123)
     print("#########################Global Model Training###############")
@@ -107,8 +107,10 @@ def global_train_loop(network, dataset, args, device):
             optimizer.step()
             optimizer.zero_grad()
 
-        print(f'Epoch: {epoch+1}/{args.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
-        self_test_acc = check_accuracy(DataLoadesr(dataset=dataset,batch_size = args.batch_size),network,device)
-        print(f'Self Test Acc {round(self_test_acc,2)*100} %')
-        
+
+        #print(f'Epoch: {epoch+1}/{args.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
+        self_test_acc = check_accuracy(DataLoader(dataset=dataset , batch_size = args.batch_size), network , device)
+        #print(f'Self Test Acc {round(self_test_acc,2)*100} %')
+        wandb.log({'Global Network {global_network_id}': {'Training Loss': total_loss/len(train_loader)}})
+        wandb.log({'Global Network {global_network_id}': {'Self Test Acc': round(self_test_acc,2)*100}})
         print()
