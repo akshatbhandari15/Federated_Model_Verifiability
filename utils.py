@@ -108,7 +108,7 @@ def global_train_loop(network, dataset, args, device):
             optimizer.zero_grad()
 
         print(f'Epoch: {epoch+1}/{args.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
-        self_test_acc = check_accuracy(DataLoader(dataset=dataset,batch_size = args.batch_size),network,device)
+        self_test_acc = check_accuracy(DataLoadesr(dataset=dataset,batch_size = args.batch_size),network,device)
         print(f'Self Test Acc {round(self_test_acc,2)*100} %')
         
         print()

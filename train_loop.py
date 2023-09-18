@@ -140,11 +140,12 @@ class trainFL:
                         loss.backward()
                         optimizer.step()
 
-                    self_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample,batch_size = self.batch_size),network,self.device)
-                    test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
-                    test_acc_log.set_description_str(f'Test Acc {round(test_acc,2)*100} %')
-                    train_loss_log.set_description_str(f'Device: {d} Epoch: {epoch+1}/{self.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
-                    self_test_acc_log.set_description_str(f'Self Test Acc {round(self_test_acc,2)*100} %')          
+                self_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample,batch_size = self.batch_size),network,self.device)
+                test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
+                wandb.log({'Test Accuracy':  {f'Client {d}:': round(test_acc,2)*100 }})
+                wandb.log({'Training Loss': {f'Client {d}': total_loss/len(train_loader)}})
+                wandb.long({'Self Test Acc': {f'Client {d}': round(self_test_acc,2)*100}})          
+                
                 local_weights.append(network.state_dict())
             if (self.args.phase == 1):
                 to_df.append(phases.phase1(self.global_network, local_weights, self.device))
