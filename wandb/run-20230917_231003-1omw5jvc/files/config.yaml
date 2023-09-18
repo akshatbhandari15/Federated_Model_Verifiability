@@ -1,0 +1,100 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.2
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.9.17
+    start_time: 1694972403.792788
+    t:
+      1:
+      - 1
+      - 41
+      - 55
+      2:
+      - 1
+      - 41
+      - 55
+      3:
+      - 16
+      - 23
+      4: 3.9.17
+      5: 0.13.2
+      8:
+      - 5
+batch_size:
+  desc: null
+  value: 64
+blur:
+  desc: null
+  value: true
+client_num_in_total:
+  desc: null
+  value: 10
+comm_round:
+  desc: null
+  value: 5
+dataset:
+  desc: null
+  value: mnist
+device:
+  desc: null
+  value: gpu
+epochs:
+  desc: null
+  value: 1
+federated_algorithm:
+  desc: null
+  value: FedAvg
+filename:
+  desc: null
+  value: lenet_mnist_100clients_0.1malclients_niid2_phase3
+gpu_id:
+  desc: null
+  value: 1
+kernal_size:
+  desc: null
+  value: 5
+label_flipping:
+  desc: null
+  value: false
+learning_rate:
+  desc: null
+  value: 0.001
+learning_rate_attack:
+  desc: null
+  value: false
+learning_rate_poison_value:
+  desc: null
+  value: 1
+loss_function:
+  desc: null
+  value: cross_entropy
+model:
+  desc: null
+  value: lenet
+niid:
+  desc: null
+  value: 2
+no_of_labels_to_flip:
+  desc: null
+  value: 3
+num_malicious_devices:
+  desc: null
+  value: 0.1
+phase:
+  desc: null
+  value: 3
+sigma:
+  desc: null
+  value: 0.6
+yaml_config_file:
+  desc: null
+  value: config.yaml
+yaml_paths:
+  desc: null
+  value:
+  - config.yaml

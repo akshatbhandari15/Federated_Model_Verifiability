@@ -1,0 +1,58 @@
+
+Malicious Devices:  [9]
+CR:   0%|                                                                                                         | 0/5 [00:00<?, ?it/s]/home/akshat/.local/lib/python3.9/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(                                                                                                 | 0/10 [00:00<?, ?it/s]
+Client Labels:  dict_keys([0, 1, 4, 5, 6, 8, 9, 3, 7, 2])
+Client Indexes to use:  [0, 4, 1, 6, 3, 2, 5, 7]
+All Labels:  dict_keys([5, 0, 4, 1, 9, 2, 3, 6, 7, 8])
+ 10%|██████████                                                                                          | 1/10 [00:07<01:09,  7.70s/it]
+Device: 0 Epoch: 1/1 	Training Loss: 0.807128
+Self Test Acc 94.0 %
+
+
+
+
+
+
+
+
+Test Acc 43.0 %
+
+Test Acc 40.0 %
+Epoch: 1/1 	Training Loss: 0.810382
+Self Test Acc 94.0 %
+#########################Global Model Training###############
+Epoch: 1/1 	Training Loss: 0.623021
+Self Test Acc 97.0 %
+
+  0%|                                                                                                             | 0/1 [00:00<?, ?it/s]
+Epoch: 1/1 	Training Loss: 0.949508
+Self Test Acc 85.0 %
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:03<00:00,  3.38s/it]
+  0%|                                                                                                             | 0/1 [00:00<?, ?it/s]
+Epoch: 1/1 	Training Loss: 0.994990
+Self Test Acc 93.0 %
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:04<00:00,  4.80s/it]
+  0%|                                                                                                             | 0/1 [00:00<?, ?it/s]
+Epoch: 1/1 	Training Loss: 0.771920
+Self Test Acc 94.0 %
+#########################Global Model Training###############
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:03<00:00,  3.35s/it]
+  0%|                                                                                                             | 0/1 [00:00<?, ?it/s]
+Self Test Acc 91.0 %
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:02<00:00,  2.38s/it]
+  0%|                                                                                                             | 0/1 [00:00<?, ?it/s]
+Epoch: 1/1 	Training Loss: 1.063738
+Self Test Acc 85.0 %
+#########################Global Model Training###############
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:03<00:00,  3.88s/it]
+  0%|                                                                                                             | 0/1 [00:00<?, ?it/s]
+
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:02<00:00,  2.32s/it]
+CR:   0%|                                                                                                         | 0/5 [01:58<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/akshat/project/train_loop.py", line 199, in <module>
+    train_object.train()
+  File "/home/akshat/project/train_loop.py", line 168, in train
+    global_train_acc = utils.check_accuracy(DataLoader(dataset=train_dataset, batch_size = self.batch_size), self.global_network, self.device)
+NameError: name 'train_dataset' is not defined
