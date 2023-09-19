@@ -91,7 +91,7 @@ def global_train_loop(network, dataset, args, device, global_network_id):
     print("#########################Global Model Training###############")
     train_loader = DataLoader(dataset=dataset, batch_size=args.batch_size, shuffle=True, worker_init_fn=seed_worker, generator=g)
     optimizer = torch.optim.Adam(network.parameters(), lr=args.learning_rate)
-    for epoch in tqdm(range(args.epochs)):
+    for epoch in range(args.epochs):
         total_loss = 0
 
         for _, (data, targets) in enumerate(train_loader):
