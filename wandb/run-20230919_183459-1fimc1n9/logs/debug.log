@@ -1,0 +1,25 @@
+2023-09-19 18:34:59,310 INFO    MainThread:2114628 [wandb_setup.py:_flush():76] Configure stats pid to 2114628
+2023-09-19 18:34:59,310 INFO    MainThread:2114628 [wandb_setup.py:_flush():76] Loading settings from /home/akshat/.config/wandb/settings
+2023-09-19 18:34:59,310 INFO    MainThread:2114628 [wandb_setup.py:_flush():76] Loading settings from /home/akshat/project/wandb/settings
+2023-09-19 18:34:59,310 INFO    MainThread:2114628 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'_require_service': 'True'}
+2023-09-19 18:34:59,310 INFO    MainThread:2114628 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'train_loop.py', 'program': '/home/akshat/project/train_loop.py'}
+2023-09-19 18:34:59,310 INFO    MainThread:2114628 [wandb_init.py:_log_setup():461] Logging user logs to /home/akshat/project/wandb/run-20230919_183459-1fimc1n9/logs/debug.log
+2023-09-19 18:34:59,311 INFO    MainThread:2114628 [wandb_init.py:_log_setup():462] Logging internal logs to /home/akshat/project/wandb/run-20230919_183459-1fimc1n9/logs/debug-internal.log
+2023-09-19 18:34:59,311 INFO    MainThread:2114628 [wandb_init.py:init():495] calling init triggers
+2023-09-19 18:34:59,311 INFO    MainThread:2114628 [wandb_init.py:init():498] wandb.init called with sweep_config: {}
+config: {'yaml_config_file': 'config.yaml', 'yaml_paths': ['config.yaml'], 'dataset': 'mnist', 'niid': 2, 'filename': 'lenet_mnist_100clients_0.1malclients_niid2_phase3', 'blur': True, 'label_flipping': False, 'learning_rate_attack': False, 'learning_rate_poison_value': 1, 'kernal_size': 5, 'sigma': 0.6, 'no_of_labels_to_flip': 3, 'model': 'lenet', 'epochs': 1, 'batch_size': 64, 'learning_rate': 0.001, 'device': 'gpu', 'loss_function': 'cross_entropy', 'federated_algorithm': 'FedAvg', 'num_malicious_devices': 0.1, 'client_num_in_total': 10, 'comm_round': 5, 'gpu_id': 1, 'phase': 3}
+2023-09-19 18:34:59,311 INFO    MainThread:2114628 [wandb_init.py:init():548] starting backend
+2023-09-19 18:34:59,311 INFO    MainThread:2114628 [wandb_init.py:init():552] setting up manager
+2023-09-19 18:34:59,315 INFO    MainThread:2114628 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-09-19 18:34:59,318 INFO    MainThread:2114628 [wandb_init.py:init():558] backend started and connected
+2023-09-19 18:34:59,329 INFO    MainThread:2114628 [wandb_init.py:init():636] updated telemetry
+2023-09-19 18:34:59,390 INFO    MainThread:2114628 [wandb_init.py:init():667] communicating run to backend with 30 second timeout
+2023-09-19 18:35:01,085 INFO    MainThread:2114628 [wandb_run.py:_on_init():1982] communicating current version
+2023-09-19 18:35:01,775 INFO    MainThread:2114628 [wandb_run.py:_on_init():1986] got version response upgrade_message: "wandb version 0.15.10 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-09-19 18:35:01,775 INFO    MainThread:2114628 [wandb_init.py:init():700] starting run threads in backend
+2023-09-19 18:35:01,873 INFO    MainThread:2114628 [wandb_run.py:_console_start():1962] atexit reg
+2023-09-19 18:35:01,874 INFO    MainThread:2114628 [wandb_run.py:_redirect():1820] redirect: SettingsConsole.WRAP_RAW
+2023-09-19 18:35:01,874 INFO    MainThread:2114628 [wandb_run.py:_redirect():1885] Wrapping output streams.
+2023-09-19 18:35:01,874 INFO    MainThread:2114628 [wandb_run.py:_redirect():1907] Redirects installed.
+2023-09-19 18:35:01,875 INFO    MainThread:2114628 [wandb_init.py:init():732] run started, returning control to user process

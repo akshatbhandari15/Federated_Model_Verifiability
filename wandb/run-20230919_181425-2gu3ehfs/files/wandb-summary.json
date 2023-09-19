@@ -1,0 +1,1 @@
+{"Test Accuracy": {"Client 4:": 21.0}, "_timestamp": 1695128141.105419, "_runtime": 675.7506639957428, "_step": 194, "Training Loss": {"Client 4": 0.13293286209885516}, "Self Test Acc": {"Client 4": 99.0}, "Global Network {global_network_id}": {"Self Test Acc": 100.0}, "Global Network Main": {"test_acc": 27.06, "train_acc": 0.2664166666666667}, "_wandb": {"runtime": 679}}

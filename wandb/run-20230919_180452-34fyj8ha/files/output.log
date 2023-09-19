@@ -1,0 +1,24 @@
+
+Malicious Devices:  [3]
+Client Labels:  dict_keys([3, 4, 6, 9, 2, 7, 0, 1, 5, 8])
+Client Indexes to use:  [0, 4, 1, 6, 2, 9, 5]
+All Labels:  dict_keys([5, 0, 4, 1, 9, 2, 3, 6, 7, 8])
+CR:   0%|                                                                                                         | 0/5 [00:00<?, ?it/s]/home/akshat/.local/lib/python3.9/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(                                                                                                 | 0/10 [00:00<?, ?it/s]
+
+
+
+
+
+
+
+
+CR:   0%|                                                                                                         | 0/5 [01:32<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/akshat/project/train_loop.py", line 196, in <module>
+    train_object.train()
+  File "/home/akshat/project/train_loop.py", line 152, in train
+    to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
+  File "/home/akshat/project/phases.py", line 76, in phase3
+    for i in tqdm(range(len(dynamic_datasets)), desc= "Global Model Training: "):
+NameError: name 'tqdm' is not defined

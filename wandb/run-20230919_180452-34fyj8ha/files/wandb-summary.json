@@ -1,0 +1,1 @@
+{"Test Accuracy": {"Client 9:": 21.0}, "_timestamp": 1695127033.2159622, "_runtime": 140.7617061138153, "_step": 29, "Training Loss": {"Client 9": 0.6097524816600176}, "Self Test Acc": {"Client 9": 93.0}, "_wandb": {"runtime": 138}}

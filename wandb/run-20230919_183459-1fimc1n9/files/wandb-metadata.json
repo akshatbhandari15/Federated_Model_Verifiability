@@ -1,0 +1,27 @@
+{
+    "os": "Linux-5.19.0-43-generic-x86_64-with-glibc2.35",
+    "python": "3.9.17",
+    "heartbeatAt": "2023-09-19T13:05:01.804751",
+    "startedAt": "2023-09-19T13:04:59.306444",
+    "docker": null,
+    "gpu": "NVIDIA GeForce GTX 1080 Ti",
+    "gpu_count": 3,
+    "cpu_count": 32,
+    "cuda": null,
+    "args": [
+        "--cf",
+        "config.yaml"
+    ],
+    "state": "running",
+    "program": "/home/akshat/project/train_loop.py",
+    "codePath": "train_loop.py",
+    "git": {
+        "remote": "https://github.com/akshatbhandari15/project.git",
+        "commit": "eaf2a30623b640b27ddd5dcb78104fc21ed88524"
+    },
+    "email": "akshatbhandari15@gmail.com",
+    "root": "/home/akshat/project",
+    "host": "deepsip1",
+    "username": "akshat",
+    "executable": "/usr/bin/python3"
+}
