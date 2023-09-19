@@ -102,7 +102,7 @@ class trainFL:
         for CR in tqdm(range(self.c_rounds), position=0, desc= "CR: "):
             #print('****************** CR ******************:',CR)
             local_weights = []
-            for d in tqdm(range(self.num_devices), position=1):
+            for d in tqdm(range(self.num_devices), position=1, desc= f"Model Training for CR {CR}: "):
                 network = copy.deepcopy(self.global_network).to(self.device)
                 optimizer = torch.optim.Adam(network.parameters(), lr=self.lr)
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
@@ -152,13 +152,12 @@ class trainFL:
                 to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
             
             cosine_similarity_all_crounds = np.array(to_df)
-            print()
             global_weights = utils.model_average(local_weights)
             self.global_network.load_state_dict(global_weights)
             global_test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset, batch_size = self.batch_size), self.global_network,self.device)
             global_test_acc = round(global_test_acc*100,2)
             
-            print(f'Global Test Acc {global_test_acc} %')
+            #print(f'Global Test Acc {global_test_acc} %')
 
             self.CR_acc.append(global_test_acc)
             

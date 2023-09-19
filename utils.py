@@ -113,4 +113,3 @@ def global_train_loop(network, dataset, args, device, global_network_id):
         #print(f'Self Test Acc {round(self_test_acc,2)*100} %')
         wandb.log({'Global Network {global_network_id}': {'Training Loss': total_loss/len(train_loader)}})
         wandb.log({'Global Network {global_network_id}': {'Self Test Acc': round(self_test_acc,2)*100}})
-        print()
