@@ -73,7 +73,7 @@ def phase3(global_network, local_weights, dynamic_datasets, args, device):
         gradient_weights.append(torch.sub(flattened_weight, flattened_weight_global))
     
     #train global model    
-    for i in tqdm(range(len(dynamic_datasets))):
+    for i in tqdm(range(len(dynamic_datasets)), desc= "Global Model Training: "):
         global_network_train = copy.deepcopy(global_network).to(device)
         cosine_similarity = []        
         global_train_loop(global_network_train, dynamic_datasets[i], args, device=device, global_network_id=i)
