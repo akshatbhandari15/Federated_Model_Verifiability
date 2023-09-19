@@ -64,9 +64,6 @@ class trainFL:
         random.seed(seed)
 
     def train(self):
-        train_loss_log = tqdm(total=0, bar_format='{desc}', position=2)
-        self_test_acc_log = tqdm(total=0, bar_format='{desc}', position=3)
-        test_acc_log = tqdm(total=0, bar_format='{desc}', position = 4)
 
         if (self.args.phase == 2):
             trusted_client = random.sample(range(self.num_devices), 1)
