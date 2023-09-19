@@ -166,7 +166,7 @@ class trainFL:
             self.CR_acc.append(global_test_acc)
             
             global_train_acc = utils.check_accuracy(DataLoader(dataset=self.train_dataset, batch_size = self.batch_size), self.global_network, self.device)
-            wandb.log({"test_acc": global_test_acc, "train_acc": global_train_acc})
+            wandb.log({"Global Network Main": {"test_acc": global_test_acc, "train_acc": global_train_acc}})
     
         filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
 
@@ -187,7 +187,7 @@ class trainFL:
         writer.close()           
 
         plt.clf()  
-        ax = sns.lineplot(y=global_test_acc, x = range(len(global_test_acc)))
+        ax = sns.lineplot(y=self.CR_acc, x = range(len(self.CR_acc)))
         ax.figure.savefig(f'Results/{filname}/{filname}_test_accuracy_plot.png')
 
 
