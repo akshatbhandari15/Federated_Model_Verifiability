@@ -11,7 +11,7 @@ import phases
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from model import LeNet
+import model
 from arguments import load_arguments
 from pathlib import Path
 from tqdm import tqdm
@@ -20,7 +20,6 @@ import wandb
 class trainFL:
     def __init__(self, args, global_network):
         self.args = args
-        self.global_network = global_network
         self.CR_acc = []
         self.device_acc = []
         self.batch_size = args.batch_size
@@ -31,6 +30,7 @@ class trainFL:
         self.c_rounds = args.comm_round
         self.num_malicious_devices = int(args.num_malicious_devices * args.client_num_in_total)
         self.device = torch.device(f"cuda:{args.gpu_id}" if torch.cuda.is_available() and args.device == "gpu" else "cpu")
+        self.global_network = global_network.to(self.device)
         self.malicious_devices = random.sample(range(self.num_devices), self.num_malicious_devices)
         wandb.init(
             # set the wandb project where this run will be logged
@@ -190,6 +190,6 @@ class trainFL:
 if __name__ == "__main__":
     args = load_arguments()
     device = torch.device(f"cuda:{args.gpu_id}" if torch.cuda.is_available() and args.device == "gpu" else "cpu")  
-    global_network = LeNet(1).to(device)
+    global_network = model.create_model(args)
     train_object = trainFL(args=args, global_network=global_network)
     train_object.train()

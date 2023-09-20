@@ -2,8 +2,6 @@ import numpy as np
 import torch
 import random
 import os
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
 
 def data_distribution(niid, trainset, no_of_clients):
     labels = []
@@ -106,9 +104,4 @@ def data_distribution(niid, trainset, no_of_clients):
 
         torch.save({'datapoints': datapoints, 'histograms': class_histogram,
                     'class_statitics': class_stats}, storepath + file_name)
-
-transform = transforms.Compose([transforms.ToTensor(),
-                                transforms.Normalize((0.5,), (0.5,))])
-train_dataset = datasets.MNIST(root="./dataset", train=True, transform=transform, download=True)
-test_dataset = datasets.MNIST(root="./dataset", train=False, transform=transform, download=True)
 

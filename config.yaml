@@ -1,7 +1,6 @@
 data_args:
-  dataset: "mnist"
+  dataset: "cifar10"
   niid: 2
-  filename: "lenet_mnist_100clients_0.1malclients_niid2_phase3"
 
 data_poison_attacks:
   blur: True
@@ -21,9 +20,9 @@ label_flipping_parameters:
   no_of_labels_to_flip: 3
 
 model_args:
-  model: "lenet"
+  model: "vgg16"
   epochs: 1
-  batch_size: 64
+  batch_size: 16
   learning_rate: 0.001
   device: 'gpu'  
   loss_function: cross_entropy

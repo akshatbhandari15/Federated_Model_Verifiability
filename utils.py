@@ -13,16 +13,59 @@ def data_loader(args):
 
     transform = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize((0.5,), (0.5,))])
-    train_dataset = datasets.MNIST(root="./dataset", train=True, transform=transform, download=True)
-    test_dataset = datasets.MNIST(root="./dataset", train=False, transform=transform, download=True)
+    if (args.dataset == "mnist"):
+        train_dataset = datasets.MNIST(root="./dataset", train=True, transform=transform, download=True)
+        test_dataset = datasets.MNIST(root="./dataset", train=False, transform=transform, download=True)
+        if (args.blur):
+            blur = transforms.GaussianBlur(args.kernal_size, sigma=args.sigma)
+            transform_w_blur = transforms.Compose([transform, blur])
+            train_dataset_with_blur = datasets.CIFAR10(root="./dataset", train=True, transform=transform_w_blur, download=True)
+            return train_dataset, test_dataset, train_dataset_with_blur
+        else:
+            return train_dataset, test_dataset
 
-    if (args.blur):
+    elif(args.dataset == "fashionmnist"):
+        train_dataset = datasets.FashionMNIST(root="./dataset", train=True, transform=transform, download=True)
+        test_dataset = datasets.FashionMNIST(root="./dataset", train=False, transform=transform, download=True)
+        if (args.blur):
+            blur = transforms.GaussianBlur(args.kernal_size, sigma=args.sigma)
+            transform_w_blur = transforms.Compose([transform, blur])
+            train_dataset_with_blur = datasets.FashionMNIST(root="./dataset", train=True, transform=transform_w_blur, download=True)
+            return train_dataset, test_dataset, train_dataset_with_blur
+        else:
+            return train_dataset, test_dataset
+
+
+    elif(args.dataset == "cifar10"):
+        train_dataset = datasets.CIFAR10(root="./dataset", train=True, transform=transform, download=True)
+        test_dataset = datasets.CIFAR10(root="./dataset", train=False, transform=transform, download=True)
+        if (args.blur):
+            blur = transforms.GaussianBlur(args.kernal_size, sigma=args.sigma)
+            transform_w_blur = transforms.Compose([transform, blur])
+            train_dataset_with_blur = datasets.CIFAR10(root="./dataset", train=True, transform=transform_w_blur, download=True)
+            return train_dataset, test_dataset, train_dataset_with_blur
+        else:
+            return train_dataset, test_dataset
+    elif(args.dataset == "cifar100"):
+        train_dataset = datasets.CIFAR100(root="./dataset", train=True, transform=transform, download=True)
+        test_dataset = datasets.CIFAR100(root="./dataset", train=False, transform=transform, download=True)
+        if (args.blur):
+            blur = transforms.GaussianBlur(args.kernal_size, sigma=args.sigma)
+            transform_w_blur = transforms.Compose([transform, blur])
+            train_dataset_with_blur = datasets.CIFAR100(root="./dataset", train=True, transform=transform_w_blur, download=True)
+            return train_dataset, test_dataset, train_dataset_with_blur
+        else:
+            return train_dataset, test_dataset
+    else:
+        raise Exception("Invalid Dataset")
+
+"""    if (args.blur):
         blur = transforms.GaussianBlur(args.kernal_size, sigma=args.sigma)
         transform_w_blur = transforms.Compose([transform, blur])
         train_dataset_with_blur = datasets.MNIST(root="./dataset", train=True, transform=transform_w_blur, download=True)
         return train_dataset, test_dataset, train_dataset_with_blur
     else:
-        return train_dataset, test_dataset
+        return train_dataset, test_dataset"""
 
 
 
