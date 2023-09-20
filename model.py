@@ -62,4 +62,14 @@ def create_model(args):
             net = models.alexnet(num_classes=10)
         else:
             net = models.alexnet(num_classes=100)
+    if args.model == 'MobileNet':
+        if args.dataset == 'cifar10':
+            net = models.mobilenet_v3_small(num_classes=10)
+        else:
+            net = models.mobilenet_v3_small(num_classes=100)    
+    if args.model == 'EfficientNet':
+        if args.dataset == 'cifar10':
+            net = models.efficientnet_v2_s(num_classes=10)
+        else:
+            net = models.efficientnet_v2_s(num_classes=100)
     return net

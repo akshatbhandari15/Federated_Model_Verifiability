@@ -3,7 +3,7 @@ data_args:
   niid: 2
 
 data_poison_attacks:
-  blur: True
+  blur: False
   label_flipping: False
 
 model_poison_attacks:
@@ -20,7 +20,7 @@ label_flipping_parameters:
   no_of_labels_to_flip: 3
 
 model_args:
-  model: "vgg16"
+  model: "lenet"
   epochs: 1
   batch_size: 16
   learning_rate: 0.001
@@ -28,7 +28,7 @@ model_args:
   loss_function: cross_entropy
 
 train_args:
-  federated_algorithm: "FedAvg"
+  federated_algorithm: "fedavg"
   num_malicious_devices: 0.1
   client_num_in_total: 10
   comm_round: 5

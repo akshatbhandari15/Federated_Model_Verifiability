@@ -16,6 +16,7 @@ from arguments import load_arguments
 from pathlib import Path
 from tqdm import tqdm
 import wandb
+import algorithms
 
 class trainFL:
     def __init__(self, args, global_network):
@@ -39,6 +40,22 @@ class trainFL:
             # track hyperparameters and run metadata
             config=vars(args)
         )        
+
+
+        if (args.federated_algorithm == "fedavg"):
+            self.federated_algorithm = algorithms.fedavg(args)
+        elif (args.federated_algorithm == "fedadagrad"):
+            self.federated_algorithm = algorithms.fedadagrad(args)
+        elif (args.federated_algorithm == "fedadam"):
+            self.federated_algorithm = algorithms.fedadam(args)
+        elif (args.federated_algorithm == "fedavgm"):
+            self.federated_algorithm = algorithms.fedavgm(args)
+        elif (args.federated_algorithm == "feddyn"):
+            self.federated_algorithm = algorithms.feddyn(args)        
+        elif (args.federated_algorithm == "fedyogi"):
+            self.federated_algorithm = algorithms.fedyogi(args)
+        else:
+            raise Exception("Invalid Algorithm")
 
         if (args.blur):
             self.train_dataset, self.test_dataset, self.train_dataset_with_blur = utils.data_loader(args)
@@ -152,7 +169,8 @@ class trainFL:
                 to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
             
             cosine_similarity_all_crounds = np.array(to_df)
-            global_weights = utils.model_average(local_weights)
+            global_model_dict = self.global_network.state_dict()
+            global_weights = self.federated_algorithm.aggregate(server_state_dict = global_model_dict, state_dicts = local_weights)
             self.global_network.load_state_dict(global_weights)
             global_test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset, batch_size = self.batch_size), self.global_network,self.device)
             global_test_acc = round(global_test_acc*100,2)
