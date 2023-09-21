@@ -99,13 +99,13 @@ class fedavgm():
     def __init__(self, config):
         self.algorithm = "FedAvgM"
         self.momentum = 0.9
-        self.lr = 1
+        self.lr = 1.0
         self.velocity = None
 
     def aggregate(self,server_state_dict,state_dicts):
 
         keys = server_state_dict.keys() #List of keys in a state_dict
-
+        
         #Averages the differences that we got by subtracting the server_model from client_model (delta_y)
         avg_delta_y = OrderedDict()
         for key in keys:
@@ -127,7 +127,15 @@ class fedavgm():
 
         #Updates server_state_dict
         for key in keys:
-            server_state_dict[key] += self.lr * avg_delta_y[key]
+            print(server_state_dict[key].dtype) 
+            print(server_state_dict[key])    
+            print(avg_delta_y[key].dtype)
+
+            if (server_state_dict[key].dtype == "torch.int64"):
+                server_state_dict[key] += (self.lr * avg_delta_y[key]).to(torch.int64)
+            else:
+                server_state_dict[key] += self.lr * avg_delta_y[key]
+
 
         return server_state_dict
 
@@ -145,7 +153,8 @@ class feddyn():
 
         keys = server_model_state_dict.keys() #List of keys in a state_dict
 
-        if not self.h: #If self.h = None, then the following line will execute.
+        if not self.h: 
+            #If self.h = None, then the following line will execute.
             #So only at first round, it'll execute
             self.h = [torch.zeros_like(server_model_state_dict[key]) for key in server_model_state_dict.keys()]
 

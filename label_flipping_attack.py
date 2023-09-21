@@ -1,4 +1,4 @@
-import random
+from numpy import random
 import torch
 from torch.utils.data import TensorDataset
 
