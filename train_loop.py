@@ -63,8 +63,8 @@ class trainFL:
             self.train_dataset, self.test_dataset = utils.data_loader(args)
 
 
-        data_distribution(self.niid, self.train_dataset, self.num_devices)
-        file_name = 'Distribution/mnist/data_split_niid_'+ str(self.niid)+ "_no_of_clients_" + str(self.num_devices)+'.pt'
+        data_distribution(self.niid, self.train_dataset, self.num_devices, self.args)
+        file_name = f'Distribution/{args.dataset}/data_split_niid_'+ str(self.niid)+ "_no_of_clients_" + str(self.num_devices)+'.pt'
         pt_file = torch.load(file_name)    
         seed = 123
         self.train_dataset_idxs = pt_file['datapoints']
@@ -133,7 +133,7 @@ class trainFL:
                         device_sample = poison_data(device_sample, self.args.no_of_labels_to_flip)
                     if (self.args.learning_rate_attack):
                         optimizer = torch.optim.Adam(network.parameters(), lr=self.args.learning_rate_poison_value)
-                train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g)
+                train_loader = DataLoader(dataset=device_sample, batch_size=self.batch_size, shuffle=True, worker_init_fn=self.seed_worker, generator=self.g, drop_last=True)
 
 
                 for epoch in range(self.epochs):
@@ -153,8 +153,11 @@ class trainFL:
                         loss.backward()
                         optimizer.step()
 
+
+
                 self_test_acc = utils.check_accuracy(DataLoader(dataset=device_sample,batch_size = self.batch_size),network,self.device)
                 test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset,batch_size = self.batch_size),network,self.device)
+                
                 wandb.log({'Test Accuracy':  {f'Client {d}:': round(test_acc,2)*100 }})
                 wandb.log({'Training Loss': {f'Client {d}': total_loss/len(train_loader)}})
                 wandb.log({'Self Test Acc': {f'Client {d}': round(self_test_acc,2)*100}})          
@@ -182,7 +185,7 @@ class trainFL:
             global_train_acc = utils.check_accuracy(DataLoader(dataset=self.train_dataset, batch_size = self.batch_size), self.global_network, self.device)
             wandb.log({"Global Network Main": {"test_acc": global_test_acc, "train_acc": global_train_acc}})
     
-        filname = f'{self.args.model}_{self.args.dataset}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
+        filname = f'{self.args.model}_{self.args.dataset}_{self.args.federated_algorithm}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
 
         Path(f"Results/{filname}").mkdir(parents=True, exist_ok=True)
 

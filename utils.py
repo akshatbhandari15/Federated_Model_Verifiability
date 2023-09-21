@@ -1,12 +1,11 @@
 import numpy as np
 import torch
 import torchvision.datasets as datasets
-import torchvision.transforms as transforms
+import torchvision.transforms.v2 as transforms
 import copy
 import random
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
-from tqdm import tqdm
 import wandb
 
 def data_loader(args):
@@ -132,7 +131,7 @@ def global_train_loop(network, dataset, args, device, global_network_id):
     g = torch.Generator()
     g.manual_seed(123)
     #print("#########################Global Model Training###############")
-    train_loader = DataLoader(dataset=dataset, batch_size=args.batch_size, shuffle=True, worker_init_fn=seed_worker, generator=g)
+    train_loader = DataLoader(dataset=dataset, batch_size=args.batch_size, shuffle=True, worker_init_fn=seed_worker, generator=g, drop_last=True)
     optimizer = torch.optim.Adam(network.parameters(), lr=args.learning_rate)
     for epoch in range(args.epochs):
         total_loss = 0
@@ -154,5 +153,5 @@ def global_train_loop(network, dataset, args, device, global_network_id):
         #print(f'Epoch: {epoch+1}/{args.epochs} \tTraining Loss: {total_loss/len(train_loader):.6f}')
         self_test_acc = check_accuracy(DataLoader(dataset=dataset , batch_size = args.batch_size), network , device)
         #print(f'Self Test Acc {round(self_test_acc,2)*100} %')
-        wandb.log({'Global Network {global_network_id}': {'Training Loss': total_loss/len(train_loader)}})
-        wandb.log({'Global Network {global_network_id}': {'Self Test Acc': round(self_test_acc,2)*100}})
+        wandb.log({f'Global Network {global_network_id}': {'Training Loss': total_loss/len(train_loader)}})
+        wandb.log({f'Global Network {global_network_id}': {'Self Test Acc': round(self_test_acc,2)*100}})

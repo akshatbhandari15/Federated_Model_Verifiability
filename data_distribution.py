@@ -3,10 +3,10 @@ import torch
 import random
 import os
 
-def data_distribution(niid, trainset, no_of_clients):
+def data_distribution(niid, trainset, no_of_clients, args):
     labels = []
     base_dir = os.getcwd()
-    storepath = os.path.join(base_dir, 'Distribution/', 'mnist'+'/')
+    storepath = os.path.join(base_dir, 'Distribution/', f'{args.dataset}'+'/')
     seed = 10
     random.seed(seed)
     num_users = no_of_clients

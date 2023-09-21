@@ -35,10 +35,7 @@ def replace_original_class_with_target_class(
         raise ValueError(
             "the length of the original class list is not equal to the length of the targeted class list"
         )
-    if len(set(original_class_list)) < len(
-            original_class_list
-    ):  # no need to check the targeted classes
-        raise ValueError("the original classes can not be same")
+
 
     for i in range(len(original_class_list)):
         for idx in range(len(data_labels)):

@@ -3,7 +3,7 @@ data_args:
   niid: 2
 
 data_poison_attacks:
-  blur: False
+  blur: True
   label_flipping: False
 
 model_poison_attacks:
@@ -20,7 +20,7 @@ label_flipping_parameters:
   no_of_labels_to_flip: 3
 
 model_args:
-  model: "lenet"
+  model: "MobileNet"
   epochs: 1
   batch_size: 16
   learning_rate: 0.001
