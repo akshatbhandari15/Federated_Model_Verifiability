@@ -1,5 +1,5 @@
 data_args:
-  dataset: "cifar10"
+  dataset: "mnist"
   niid: 2
 
 data_poison_attacks:
@@ -20,7 +20,7 @@ label_flipping_parameters:
   no_of_labels_to_flip: 3
 
 model_args:
-  model: "MobileNet"
+  model: "lenet"
   epochs: 1
   batch_size: 16
   learning_rate: 0.001

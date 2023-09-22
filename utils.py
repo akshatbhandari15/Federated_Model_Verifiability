@@ -18,7 +18,7 @@ def data_loader(args):
         if (args.blur):
             blur = transforms.GaussianBlur(args.kernal_size, sigma=args.sigma)
             transform_w_blur = transforms.Compose([transform, blur])
-            train_dataset_with_blur = datasets.CIFAR10(root="./dataset", train=True, transform=transform_w_blur, download=True)
+            train_dataset_with_blur = datasets.MNIST(root="./dataset", train=True, transform=transform_w_blur, download=True)
             return train_dataset, test_dataset, train_dataset_with_blur
         else:
             return train_dataset, test_dataset
