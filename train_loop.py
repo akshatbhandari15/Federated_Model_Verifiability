@@ -101,7 +101,7 @@ class trainFL:
             for i in trusted_clients:
                 device_sample_labels = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[i])
                 labels = get_client_data_stat(device_sample_labels)
-                if (len(client_labels.keys() ^ labels.keys()) > 0):
+                if (not set(labels.keys()).issubset(client_labels.keys())):
                     client_idx_dynamic_dataset.append(i)
                     dynamic_datasets.append(device_sample_labels)
                     client_labels.update(labels)
