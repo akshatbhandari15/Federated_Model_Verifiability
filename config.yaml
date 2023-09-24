@@ -1,9 +1,9 @@
 data_args:
-  dataset: "mnist"
+  dataset: "cifar10"
   niid: 2
 
 data_poison_attacks:
-  blur: True
+  blur: False
   label_flipping: False
 
 model_poison_attacks:

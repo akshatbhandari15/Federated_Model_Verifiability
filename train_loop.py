@@ -108,7 +108,6 @@ class trainFL:
                 if (len(client_labels.items()) == len(all_labels.items())):
                     break
             
-
             print("Client Labels: ", client_labels.keys())
             print("Client Indexes to use: ", client_idx_dynamic_dataset)
             print("All Labels: ", all_labels.keys())
@@ -116,6 +115,8 @@ class trainFL:
 
         to_df = []
         cosine_similarity_all_crounds = []
+
+
         for CR in tqdm(range(self.c_rounds), position=0, desc= "CR: "):
             #print('****************** CR ******************:',CR)
             local_weights = []
@@ -125,7 +126,7 @@ class trainFL:
                 device_sample = torch.utils.data.Subset(self.train_dataset, self.train_dataset_idxs[d])
                 if (self.args.loss_function == "cross_entropy"):
                     criterion = F.cross_entropy           
-                            
+
                 if d in self.malicious_devices:
                     if (self.args.blur):
                         device_sample = torch.utils.data.Subset(self.train_dataset_with_blur, self.train_dataset_idxs[d])
@@ -169,31 +170,26 @@ class trainFL:
                 to_df.append(phases.phase2(self.global_network, local_weights, dataset_to_train_global_model, self.args, self.device))
             
             elif(self.args.phase == 3):
-                to_df.append(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device))
+                to_df.append(np.array(phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device)))
+                #to_df = phases.phase3(self.global_network, local_weights, dynamic_datasets, args=self.args, device=self.device)
             
-            cosine_similarity_all_crounds = np.array(to_df)
+            #cosine_similarity_all_crounds = np.array(to_df)
             global_model_dict = self.global_network.state_dict()
             global_weights = self.federated_algorithm.aggregate(server_state_dict = global_model_dict, state_dicts = local_weights)
             self.global_network.load_state_dict(global_weights)
             global_test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset, batch_size = self.batch_size), self.global_network,self.device)
             global_test_acc = round(global_test_acc*100,2)
-            
-            #print(f'Global Test Acc {global_test_acc} %')
-
             self.CR_acc.append(global_test_acc)
             
             global_train_acc = utils.check_accuracy(DataLoader(dataset=self.train_dataset, batch_size = self.batch_size), self.global_network, self.device)
             wandb.log({"Global Network Main": {"test_acc": global_test_acc, "train_acc": global_train_acc}})
-    
+
         filname = f'{self.args.model}_{self.args.dataset}_{self.args.federated_algorithm}_{self.args.client_num_in_total}clients_{self.args.num_malicious_devices}_niid{self.args.niid}_phase{self.args.phase}'
 
         Path(f"Results/{filname}").mkdir(parents=True, exist_ok=True)
 
         writer = pd.ExcelWriter(f'Results/{filname}/{filname}.xlsx', engine='xlsxwriter')
-
-
-        to_df = np.array(cosine_similarity_all_crounds)
-
+        to_df = np.array(to_df)
         print(to_df.shape)
         for i in range(0, to_df.shape[1]):
                 df = pd.DataFrame(to_df[:, i, :])
@@ -206,7 +202,6 @@ class trainFL:
         plt.clf()  
         ax = sns.lineplot(y=self.CR_acc, x = range(len(self.CR_acc)))
         ax.figure.savefig(f'Results/{filname}/{filname}_test_accuracy_plot.png')
-
 
 if __name__ == "__main__":
     args = load_arguments()
