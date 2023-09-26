@@ -12,6 +12,9 @@ def data_loader(args):
 
     transform = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize((0.5,), (0.5,))])
+    if(args.dataset == "mnist" and args.model == "lenet"):
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Resize((32,32), antialias = True),transforms.Normalize((0.5,), (0.5,))])
+
     if (args.dataset == "mnist"):
         train_dataset = datasets.MNIST(root="./dataset", train=True, transform=transform, download=True)
         test_dataset = datasets.MNIST(root="./dataset", train=False, transform=transform, download=True)

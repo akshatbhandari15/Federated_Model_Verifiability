@@ -15,7 +15,6 @@ class LeNet(nn.Module):
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_classes)
         self.relu = nn.ReLU()
-        self.logSoftmax = nn.LogSoftmax(dim=1)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -24,7 +23,6 @@ class LeNet(nn.Module):
         x = self.conv2(x)
         x = self.relu(x)
         x = self.pool2(x)
-        print(x.shape)
         x = torch.flatten(x, 1)
         x = self.fc1(x)
         x = self.relu(x)

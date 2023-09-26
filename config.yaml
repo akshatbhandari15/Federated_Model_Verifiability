@@ -1,10 +1,10 @@
 data_args:
-  dataset: "cifar10"
-  niid: 2
+  dataset: "mnist"
+  niid: 1
 
 data_poison_attacks:
   blur: False
-  label_flipping: False
+  label_flipping: True
 
 model_poison_attacks:
   learning_rate_attack: False
@@ -17,7 +17,7 @@ blur_parameters:
   sigma: 0.6
 
 label_flipping_parameters:
-  no_of_labels_to_flip: 3
+  no_of_labels_to_flip: 10
 
 model_args:
   model: "lenet"
@@ -29,8 +29,8 @@ model_args:
 
 train_args:
   federated_algorithm: "fedavg"
-  num_malicious_devices: 0.1
-  client_num_in_total: 10
+  num_malicious_devices: 0.2
+  client_num_in_total: 100
   comm_round: 5
   device: 'gpu'
   gpu_id: 1
