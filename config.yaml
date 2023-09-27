@@ -1,5 +1,5 @@
 data_args:
-  dataset: "mnist"
+  dataset: "cifar10"
   niid: 1
 
 data_poison_attacks:
@@ -30,7 +30,7 @@ model_args:
 train_args:
   federated_algorithm: "fedavg"
   num_malicious_devices: 0.2
-  client_num_in_total: 100
+  client_num_in_total: 10
   comm_round: 5
   device: 'gpu'
   gpu_id: 1

@@ -10,7 +10,6 @@ def replace_original_class_with_target_class(
     :type targets: list
     :return: new class IDs
     """
-    #print(data_labels.size())
     data_labels_set = np.unique(data_labels)
     if( no_of_labels_to_flip > len(data_labels_set)):
         no_of_labels_to_flip = len(data_labels_set)
@@ -41,8 +40,6 @@ def replace_original_class_with_target_class(
             #print(data_labels[idx] == original_class_list[i])
             if data_labels[idx] == original_class_list[i]:
                 data_labels[idx] = torch.as_tensor(target_class_list[i])
-    
-    print(data_labels.size())
     return data_labels
 
 def get_client_data_stat(local_dataset):
