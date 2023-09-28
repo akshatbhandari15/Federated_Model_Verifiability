@@ -192,10 +192,10 @@ class trainFL:
         to_df = np.array(to_df)
         print(len(to_df.shape))
         if (len(to_df.shape)==2):
-            np.expand_dims(to_df, axis=0)
+            to_df = np.expand_dims(to_df, axis=0)
         elif (len(to_df.shape)==1):
-            np.expand_dims(to_df, axis=0)
-            np.expand_dims(to_df, axis=0)
+            to_df = np.expand_dims(to_df, axis=0)
+            to_df = np.expand_dims(to_df, axis=0)
 
 
         print(len(to_df.shape))

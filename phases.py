@@ -18,7 +18,6 @@ def phase1(global_network, local_weights, device):
             flattened_weight = torch.cat((flattened_weight, torch.flatten(value)))
 
         cosine_similarity.append(F.cosine_similarity(flattened_weight, flattened_weight_global, dim = 0).tolist())
-    print(cosine_similarity)
     return cosine_similarity
 
 def phase2(global_network, local_weights, dataset_to_train_global_model, args, device):
@@ -38,7 +37,6 @@ def phase2(global_network, local_weights, dataset_to_train_global_model, args, d
             flattened_weight = torch.cat((flattened_weight, torch.flatten(value)))
  
         gradient_weights.append(torch.sub(flattened_weight, flattened_weight_global))
-        print(gradient_weights)
     
     #train global model    
     global_network_train = copy.deepcopy(global_network).to(device)
