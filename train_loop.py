@@ -190,15 +190,12 @@ class trainFL:
 
         writer = pd.ExcelWriter(f'Results/{filname}/{filname}.xlsx', engine='xlsxwriter')
         to_df = np.array(to_df)
-        print(len(to_df.shape))
         if (len(to_df.shape)==2):
             to_df = np.expand_dims(to_df, axis=0)
         elif (len(to_df.shape)==1):
             to_df = np.expand_dims(to_df, axis=0)
             to_df = np.expand_dims(to_df, axis=0)
 
-
-        print(len(to_df.shape))
         for i in range(0, to_df.shape[1]):
                 df = pd.DataFrame(to_df[:, i, :])
                 df.to_excel(writer, sheet_name='Dataset%d' % i)
