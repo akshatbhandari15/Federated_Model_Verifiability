@@ -1,5 +1,5 @@
 data_args:
-  dataset: "cifar10"
+  dataset: "mnist"
   niid: 1
 
 data_poison_attacks:
@@ -21,7 +21,7 @@ label_flipping_parameters:
 
 model_args:
   model: "lenet"
-  epochs: 1
+  epochs: 2
   batch_size: 16
   learning_rate: 0.001
   device: 'gpu'  
@@ -29,13 +29,11 @@ model_args:
 
 train_args:
   federated_algorithm: "fedavg"
-  num_malicious_devices: 0
+  num_malicious_devices: 0.2
   client_num_in_total: 10
-  comm_round: 5
+  comm_round: 2
   device: 'gpu'
   gpu_id: 1
 
-
-
 phase:
-  phase: 2
+  phase: 1
