@@ -1,6 +1,6 @@
 data_args:
   dataset: "mnist"
-  niid: 1
+  niid: 2
 
 data_poison_attacks:
   blur: False
@@ -30,10 +30,10 @@ model_args:
 train_args:
   federated_algorithm: "fedavg"
   num_malicious_devices: 0.2
-  client_num_in_total: 10
-  comm_round: 2
+  client_num_in_total: 100
+  comm_round: 30
   device: 'gpu'
   gpu_id: 1
 
 phase:
-  phase: 1
+  phase: 3

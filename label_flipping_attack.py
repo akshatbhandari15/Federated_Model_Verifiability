@@ -10,16 +10,27 @@ def replace_original_class_with_target_class(
     :type targets: list
     :return: new class IDs
     """
+    #print("Printing data label")
+    #print(data_labels)
     data_labels_set = np.unique(data_labels)
     if( no_of_labels_to_flip > len(data_labels_set)):
         no_of_labels_to_flip = len(data_labels_set)
     original_class_list = random.choice(data_labels_set, no_of_labels_to_flip, replace = False)
     target_class_list = random.choice(data_labels_set, no_of_labels_to_flip, replace = False)
 
-    for i in range(len(target_class_list)):
-        while (original_class_list[i] == target_class_list[i]):
-            target_class_list[i] = random.choice(data_labels_set)
 
+
+    for i in range(len(target_class_list)):
+        try:
+            target_class_list[i] = random.choice([ele for ele in data_labels_set if ele != original_class_list[i]])
+        except ValueError:
+            target_class_list[i] = original_class_list[i]
+
+    
+
+
+    #print(original_class_list)
+    #print(target_class_list)
 
     if (
             len(original_class_list) == 0
@@ -40,6 +51,7 @@ def replace_original_class_with_target_class(
             #print(data_labels[idx] == original_class_list[i])
             if data_labels[idx] == original_class_list[i]:
                 data_labels[idx] = torch.as_tensor(target_class_list[i])
+    print(data_labels)
     return data_labels
 
 def get_client_data_stat(local_dataset):
