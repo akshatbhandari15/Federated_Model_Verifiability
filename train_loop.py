@@ -69,6 +69,7 @@ class trainFL:
         seed = 123
         self.train_dataset_idxs = pt_file['datapoints']
         print("Malicious Devices: ", self.malicious_devices)
+        np.save("malicious_devices.npy", self.malicious_devices)
         self.g = torch.Generator()
         self.g.manual_seed(seed)    
         torch.manual_seed(seed)
@@ -108,8 +109,10 @@ class trainFL:
                 if (len(client_labels.items()) == len(all_labels.items())):
                     break
             
+
             print("Client Labels: ", client_labels.keys())
             print("Client Indexes to use: ", client_idx_dynamic_dataset)
+            np.save("devices_used_to_train_global_model", client_idx_dynamic_dataset)
             print("All Labels: ", all_labels.keys())
 
 
