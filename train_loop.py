@@ -17,6 +17,8 @@ from pathlib import Path
 from tqdm import tqdm
 import wandb
 import algorithms
+from defenses.foolsgold_defense import FoolsGoldDefense
+from defenses.norm_diff_clipping_defense import NormDiffClippingDefense
 
 class trainFL:
     def __init__(self, args, global_network):
@@ -41,6 +43,12 @@ class trainFL:
             config=vars(args)
         )        
 
+
+        if (self.args.enable_defense == True):
+            if (self.args.defense_type=="foolsgold"):
+                self.defense = FoolsGoldDefense(self.args)
+            if (self.args.defense_type=="norm_diff_clipping_defense"):
+                self.defense = NormDiffClippingDefense(self.args)
 
         if (args.federated_algorithm == "fedavg"):
             self.federated_algorithm = algorithms.fedavg(args)
@@ -178,6 +186,22 @@ class trainFL:
             
             #cosine_similarity_all_crounds = np.array(to_df)
             global_model_dict = self.global_network.state_dict()
+            
+            if (self.args.enable_defense == True):
+                raw_client_grad_list = []
+                for i in range(len(local_weights)):
+                    raw_client_grad_list.append((i, local_weights[i]))
+
+                if (self.args.defense_type=="foolsgold"):
+                    aggr_result = self.defense.defend_before_aggregation(raw_client_grad_list)
+                if (self.args.defense_type=="norm_diff_clipping_defense"):
+                    aggr_result = self.defense.defend_before_aggregation(raw_client_grad_list, extra_auxiliary_info=global_model_dict)
+
+
+                for i in range(len(local_weights)):
+                    (p, grads) = aggr_result[i]
+                    local_weights[i] = grads
+            
             global_weights = self.federated_algorithm.aggregate(server_state_dict = global_model_dict, state_dicts = local_weights)
             self.global_network.load_state_dict(global_weights)
             global_test_acc = utils.check_accuracy(DataLoader(dataset=self.test_dataset, batch_size = self.batch_size), self.global_network,self.device)
